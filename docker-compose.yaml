@@ -1,18 +1,49 @@
 services:
   api:
     image: viet-tts:latest
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      # Sử dụng buildkit để tối ưu cache
+      cache_from:
+        - viet-tts:latest
     restart: always
     container_name: viet-tts-service
     ports:
-      - 8298:8298
+      - "8298:8298"
+    
+    # Bỏ phần deploy GPU - chạy trên CPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    
+    # Giới hạn tài nguyên cho CPU
     deploy:
       resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
         reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+          memory: 2G
+          cpus: '1.0'
+    
     volumes:
       - ./pretrained-models:/app/pretrained-models
+      # Mount cache volumes để tăng tốc build
+      - poetry-cache:/tmp/poetry_cache
+      - pip-cache:/root/.cache/pip
+    
     command: viettts server --host 0.0.0.0 --port 8298
+    
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Force sử dụng CPU
+      - CUDA_VISIBLE_DEVICES=""
+
+volumes:
+  poetry-cache:
+  pip-cache:

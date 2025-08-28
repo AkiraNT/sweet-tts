@@ -1,0 +1,70 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.pytest_cache/
+
+# Poetry
+poetry.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Local files
+.env
+.env.local
+
+# Pretrained models (sẽ mount từ host)
+pretrained-models/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Tests
+tests/
+test_*
+*_test.py
+
+# Temporary files
+tmp/
+temp/
