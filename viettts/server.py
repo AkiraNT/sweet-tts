@@ -32,11 +32,11 @@ tts_obj = None
 
 
 app = FastAPI(
-    title="VietTTS API",
+    title="SweetTTS API",
     description="""
-    VietTTS API (https://github.com/dangvansam/viet-tts)
+    SweetTTS API
     Vietnamese Text To Speech and Voice Clone
-    License: Apache 2.0 - Author: <dangvansam dangvansam98@gmail.com>
+    License: Apache 2.0 - Author: <SweetSoft info@sweetsoft.vn>
     """
 )
 app.add_middleware(
@@ -82,11 +82,11 @@ def wav_chunk_header(sample_rate=22050, bit_depth=16, channels=1):
 
 @app.get("/", response_class=PlainTextResponse)
 async def root():
-    return 'VietTTS API'
+    return 'SweetTTS API'
 
 @app.get("/health", response_class=PlainTextResponse)
 async def health():
-    return 'VietTTS API is running...'
+    return 'SweetTTS API is running...'
 
 @app.get("/voices")
 @app.get("/v1/voices")
