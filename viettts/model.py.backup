@@ -1,4 +1,3 @@
-import os
 from loguru import logger
 import torch
 import numpy as np
@@ -8,6 +7,7 @@ from torch.nn import functional as F
 from contextlib import nullcontext
 import uuid
 from viettts.utils.common import fade_in_out_audio
+
 class TTSModel:
     def __init__(
         self,
@@ -42,89 +42,14 @@ class TTSModel:
         self.hift_cache_dict = {}
 
     def load(self, llm_model, flow_model, hift_model):
-        """
-        Smart model loading with automatic CPU/GPU detection and precision handling
-        """
-        # Determine device and precision based on availability
-        if torch.cuda.is_available() and not os.environ.get('FORCE_CPU', False):
-            self.device = torch.device('cuda')
-            use_half_precision = True
-            print(f"🚀 Using GPU: {torch.cuda.get_device_name()}")
-        else:
-            self.device = torch.device('cpu')
-            use_half_precision = False
-            print("🖥️  Using CPU (GPU not available or FORCE_CPU=True)")
-        
-        # Load LLM model
-        print("Loading LLM model...")
-        llm_checkpoint = torch.load(llm_model, map_location=self.device)
-        
-        # Convert half precision to float32 if loading on CPU
-        if not use_half_precision and self.device.type == 'cpu':
-            llm_checkpoint = self._convert_checkpoint_precision(llm_checkpoint)
-        
-        self.llm.load_state_dict(llm_checkpoint)
+        self.llm.load_state_dict(torch.load(llm_model, map_location=self.device))
         self.llm.to(self.device).eval()
-        
-        # Apply precision: half() only on GPU, float() on CPU
-        if use_half_precision:
-            self.llm.half()
-            print("✅ LLM loaded with FP16 precision on GPU")
-        else:
-            self.llm.float()
-            print("✅ LLM loaded with FP32 precision on CPU")
-        
-        # Load Flow model
-        print("Loading Flow model...")
-        flow_checkpoint = torch.load(flow_model, map_location=self.device)
-        
-        if not use_half_precision and self.device.type == 'cpu':
-            flow_checkpoint = self._convert_checkpoint_precision(flow_checkpoint)
-        
-        self.flow.load_state_dict(flow_checkpoint)
+        self.llm.half()
+        self.flow.load_state_dict(torch.load(flow_model, map_location=self.device))
         self.flow.to(self.device).eval()
-        
-        if use_half_precision:
-            self.flow.half()
-            print("✅ Flow loaded with FP16 precision on GPU")
-        else:
-            self.flow.float()
-            print("✅ Flow loaded with FP32 precision on CPU")
-        
-        # Load HiFT model  
-        print("Loading HiFT model...")
-        hift_checkpoint = torch.load(hift_model, map_location=self.device)
-        
-        if not use_half_precision and self.device.type == 'cpu':
-            hift_checkpoint = self._convert_checkpoint_precision(hift_checkpoint)
-            
-        self.hift.load_state_dict(hift_checkpoint)
+        self.hift.load_state_dict(torch.load(hift_model, map_location=self.device))
         self.hift.to(self.device).eval()
-        
-        if use_half_precision:
-            self.hift.half()
-            print("✅ HiFT loaded with FP16 precision on GPU")
-        else:
-            self.hift.float() 
-            print("✅ HiFT loaded with FP32 precision on CPU")
-        
-        print(f"🎉 All models loaded successfully on {self.device}")
-    def _convert_checkpoint_precision(self, checkpoint):
-        """
-        Convert model checkpoint from half precision to float32 for CPU compatibility
-        """
-        def convert_recursive(obj):
-            if isinstance(obj, torch.Tensor):
-                if obj.dtype == torch.float16:
-                    return obj.float()
-                return obj
-            elif isinstance(obj, dict):
-                return {k: convert_recursive(v) for k, v in obj.items()}
-            elif isinstance(obj, (list, tuple)):
-                return type(obj)(convert_recursive(item) for item in obj)
-            return obj
-        
-        return convert_recursive(checkpoint)
+
     def load_jit(self, llm_text_encoder_model, llm_llm_model, flow_encoder_model):
         llm_text_encoder = torch.jit.load(llm_text_encoder_model, map_location=self.device)
         self.llm.text_encoder = llm_text_encoder
