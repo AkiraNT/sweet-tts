@@ -101,6 +101,7 @@ class TransformerLM(torch.nn.Module):
         text_token, text_token_len = self.encode(text_token, text_token_len)
 
         # 2. embedding projection
+        embedding = embedding.to(torch.float32)
         embedding = F.normalize(embedding, dim=1)
         embedding = self.spk_embed_affine_layer(embedding)
         embedding = embedding.unsqueeze(1)
