@@ -43,9 +43,3 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.setuptools]
 packages = ["viettts"]
-
-[[tool.poetry.source]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-priority = "supplemental"
-
