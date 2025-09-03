@@ -19,7 +19,7 @@ onnxruntime-gpu = "1.16.0"
 protobuf = "4.25"
 pydantic = "2.7.0"
 soundfile = "0.12.1"
-torch = { version = ">=2.2.0", source = "pytorch-cpu" }
+torch = "2.0.1"
 torchaudio = "2.0.2"
 uvicorn = "0.30.0"
 wget = "3.2"
@@ -32,7 +32,7 @@ click = "^8.1.7"
 gunicorn = "^23.0.0"
 silero-vad = "^5.1.2"
 tiktoken = "^0.8.0"
-openai-whisper = "^20240917"
+openai-whisper = "^20240930"
 
 [tool.poetry.scripts]
 viettts = "viettts.cli:cli"
