@@ -34,7 +34,7 @@ services:
     volumes:
       - ./pretrained-models:/app/pretrained-models
     
-    command: viettts server --host 0.0.0.0 --port 8298
+    command: python -m viettts.cli server --host 0.0.0.0 --port 8298
     
     environment:
       - PYTHONUNBUFFERED=1
