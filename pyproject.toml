@@ -32,7 +32,7 @@ click = "^8.1.7"
 gunicorn = "^23.0.0"
 silero-vad = "^5.1.2"
 tiktoken = "^0.8.0"
-openai-whisper = "^20240930"
+openai-whisper = "^20240917"
 
 [tool.poetry.scripts]
 viettts = "viettts.cli:cli"
@@ -47,4 +47,5 @@ packages = ["viettts"]
 [[tool.poetry.source]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
-default = false
+priority = "supplemental"
+
