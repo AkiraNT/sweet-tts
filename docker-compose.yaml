@@ -4,7 +4,6 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-      # Sử dụng buildkit để tối ưu cache
       cache_from:
         - viet-tts:latest
     restart: always
@@ -12,16 +11,6 @@ services:
     ports:
       - "8298:8298"
     
-    # Bỏ phần deploy GPU - chạy trên CPU
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
-    
-    # Giới hạn tài nguyên cho CPU
     deploy:
       resources:
         limits:
@@ -33,12 +22,14 @@ services:
     
     volumes:
       - ./pretrained-models:/app/pretrained-models
-    
+      - ./viettts:/app/viettts       
+      - ./samples:/app/samples      
+      - ./web:/app/web              
+
     command: python -m viettts.cli server --host 0.0.0.0 --port 8298
     
     environment:
       - PYTHONUNBUFFERED=1
-      # Force sử dụng CPU
       - CUDA_VISIBLE_DEVICES=""
 
 volumes:
