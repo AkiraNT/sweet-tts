@@ -14,11 +14,15 @@ import torch.nn.functional as F
 if not torch.cuda.is_available():
     torch.set_default_dtype(torch.float32)
 
-def ensure_float32(tensor):
-    """Đảm bảo tensor là FP32 trên CPU"""
-    if tensor.dtype == torch.float16 and tensor.device.type == 'cpu':
-        return tensor.float()
-    return tensor
+# Global fix cho Half precision trên CPU
+original_normalize = F.normalize
+
+def safe_normalize(input, p=2, dim=1, eps=1e-12, out=None):
+    if input.dtype == torch.float16 and input.device.type == 'cpu':
+        input = input.float()
+    return original_normalize(input, p, dim, eps, out)
+
+F.normalize = safe_normalize
 class TTSModel:
     def __init__(
         self,

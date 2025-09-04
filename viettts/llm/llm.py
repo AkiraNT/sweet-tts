@@ -101,10 +101,9 @@ class TransformerLM(torch.nn.Module):
         text_token, text_token_len = self.encode(text_token, text_token_len)
 
         # 2. embedding projection
-        # CPU-safe normalize - convert half to float first
         if embedding.dtype == torch.float16:
             embedding = embedding.float()
-        embedding = F.normalize(ensure_float32(embedding), dim=1)
+        embedding = F.normalize(embedding, dim=1)
         embedding = self.spk_embed_affine_layer(embedding)
         embedding = embedding.unsqueeze(1)
 
@@ -154,8 +153,11 @@ class TransformerLM(torch.nn.Module):
             min_token_text_ratio: float = 2,
     ) -> Generator[torch.Tensor, None, None]:
         device = text.device
-        if self.model.dtype == torch.float16:
-            self.model = self.model.float()
+        if not torch.cuda.is_available():
+        # Convert tất cả parameters về float32
+        for param in self.parameters():
+            if param.dtype == torch.float16:
+                param.data = param.data.float()
         text = torch.concat([prompt_text, text], dim=1)
         text_len += prompt_text_len
         text = self.text_embedding(text)
@@ -167,7 +169,7 @@ class TransformerLM(torch.nn.Module):
             # CPU-safe normalize - convert half to float first
             if embedding.dtype == torch.float16:
                 embedding = embedding.float()
-            embedding = F.normalize(ensure_float32(embedding), dim=1)
+            embedding = F.normalize(embedding, dim=1)
             embedding = self.spk_embed_affine_layer(embedding)
             embedding = embedding.unsqueeze(dim=1)
         else:
