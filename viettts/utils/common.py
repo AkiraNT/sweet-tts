@@ -133,11 +133,16 @@ def fade_in_out(fade_in_mel, fade_out_mel, window):
 
 def fade_in_out_audio(audio: torch.Tensor):
     device = audio.device
-    audio = audio.squeeze(0).cpu()
+    audio = audio.squeeze(0).cpu().clone()  # Clone ngay sau khi chuyển về CPU
+    
     overlap_len = int(22050 * 0.1)
     window = torch.linspace(0, 1, overlap_len, dtype=torch.float32)
-    audio[:overlap_len] *= window
-    audio[-overlap_len:] *= window.flip([0])
+    
+    # Đảm bảo không vượt quá độ dài audio
+    if len(audio) > overlap_len * 2:
+        audio[:overlap_len] *= window
+        audio[-overlap_len:] *= window.flip([0])
+    
     return audio.unsqueeze(0).to(device)
 
 def set_all_random_seed(seed):
