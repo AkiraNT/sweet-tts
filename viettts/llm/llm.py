@@ -154,10 +154,10 @@ class TransformerLM(torch.nn.Module):
     ) -> Generator[torch.Tensor, None, None]:
         device = text.device
         if not torch.cuda.is_available():
-        # Convert tất cả parameters về float32
-        for param in self.parameters():
-            if param.dtype == torch.float16:
-                param.data = param.data.float()
+            # Convert tất cả parameters về float32
+            for param in self.parameters():
+                if param.dtype == torch.float16:
+                    param.data = param.data.float()
         text = torch.concat([prompt_text, text], dim=1)
         text_len += prompt_text_len
         text = self.text_embedding(text)
