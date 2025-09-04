@@ -8,6 +8,17 @@ from torch.nn import functional as F
 from contextlib import nullcontext
 import uuid
 from viettts.utils.common import fade_in_out_audio
+import torch.nn.functional as F
+
+# Force FP32 trên CPU để tránh lỗi Half precision
+if not torch.cuda.is_available():
+    torch.set_default_dtype(torch.float32)
+
+def ensure_float32(tensor):
+    """Đảm bảo tensor là FP32 trên CPU"""
+    if tensor.dtype == torch.float16 and tensor.device.type == 'cpu':
+        return tensor.float()
+    return tensor
 class TTSModel:
     def __init__(
         self,
@@ -40,6 +51,14 @@ class TTSModel:
         self.llm_end_dict = {}
         self.mel_overlap_dict = {}
         self.hift_cache_dict = {}
+         # Force tất cả models về FP32 trên CPU
+        if not torch.cuda.is_available():
+            if hasattr(self, 'llm') and self.llm is not None:
+                self.llm = self.llm.float()
+            if hasattr(self, 'flow') and self.flow is not None:
+                self.flow = self.flow.float()
+            if hasattr(self, 'hift') and self.hift is not None:
+                self.hift = self.hift.float()
 
     def load(self, llm_model, flow_model, hift_model):
         """

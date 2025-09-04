@@ -85,7 +85,7 @@ class MaskedDiffWithXvec(torch.nn.Module):
         # CPU-safe normalize - convert half to float first
         if embedding.dtype == torch.float16:
             embedding = embedding.float()
-        embedding = F.normalize(embedding, dim=1)
+        embedding = F.normalize(ensure_float32(embedding), dim=1)
         embedding = self.spk_embed_affine_layer(embedding)
 
         # concat text and prompt_text
@@ -131,7 +131,7 @@ class MaskedDiffWithXvec(torch.nn.Module):
         # CPU-safe normalize - convert half to float first
         if embedding.dtype == torch.float16:
             embedding = embedding.float()
-        embedding = F.normalize(embedding, dim=1)
+        embedding = F.normalize(ensure_float32(embedding), dim=1)
         embedding = self.spk_embed_affine_layer(embedding)
 
         # concat text and prompt_text
