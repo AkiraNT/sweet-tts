@@ -82,6 +82,9 @@ class MaskedDiffWithXvec(torch.nn.Module):
         embedding = batch['embedding'].to(device)
 
         # xvec projection
+        # CPU-safe normalize - convert half to float first
+        if embedding.dtype == torch.float16:
+            embedding = embedding.float()
         embedding = F.normalize(embedding, dim=1)
         embedding = self.spk_embed_affine_layer(embedding)
 
@@ -125,6 +128,9 @@ class MaskedDiffWithXvec(torch.nn.Module):
                   embedding):
         assert token.shape[0] == 1
         # xvec projection
+        # CPU-safe normalize - convert half to float first
+        if embedding.dtype == torch.float16:
+            embedding = embedding.float()
         embedding = F.normalize(embedding, dim=1)
         embedding = self.spk_embed_affine_layer(embedding)
 
@@ -139,6 +145,10 @@ class MaskedDiffWithXvec(torch.nn.Module):
         h, h_lengths = self.encoder(token, token_len)
         h = self.encoder_proj(h)
         mel_len1, mel_len2 = prompt_feat.shape[1], int(token_len2 / self.input_frame_rate * 22050 / 256)
+        # Safety check for mel_len2
+        if mel_len2 == 0:
+            print("⚠️  Warning: mel_len2 is 0, using minimum value of 1")
+            mel_len2 = 1
         h, h_lengths = self.length_regulator.inference(h[:, :token_len1], h[:, token_len1:], mel_len1, mel_len2, self.input_frame_rate)
 
         # get conditions
