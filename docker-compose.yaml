@@ -24,13 +24,18 @@ services:
       - ./pretrained-models:/app/pretrained-models
       - ./viettts:/app/viettts       
       - ./samples:/app/samples      
-      - ./web:/app/web              
+      - ./web:/app/web
+      - ./start_dev.py:/app/start_dev.py  # Mount simple dev script
 
-    command: viettts server --host 0.0.0.0 --port 8298
+    # Sử dụng simple development server
+    command: python start_dev.py
     
     environment:
       - PYTHONUNBUFFERED=1
       - CUDA_VISIBLE_DEVICES=""
+      - FORCE_CPU=1
+      - PYTHONPATH=/app
+      - ENVIRONMENT=development
 
 volumes:
   poetry-cache:
