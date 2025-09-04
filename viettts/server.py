@@ -84,6 +84,11 @@ def wav_chunk_header(sample_rate=22050, bit_depth=16, channels=1):
 async def root():
     return 'SweetTTS API'
 
+# Route cho demo.html
+@app.get("/demo.html")
+async def demo():
+    return FileResponse("web/demo.html")
+
 @app.get("/health", response_class=PlainTextResponse)
 async def health():
     return 'SweetTTS API is running...'
